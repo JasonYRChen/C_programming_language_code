@@ -16,6 +16,9 @@ int min(int n1, int n2)
 
 int len(long num)
 {
+    if (num == 0)
+        return 1;
+
     int length;
     for (length = 0; num; length++) {
         num = num >> 1;
@@ -52,9 +55,9 @@ long setbits(long num, int position, int range, long template)
 
     if (position > (length_num - 1))
         position = length_num - 1;
-    if (range > min(position + 1, length_template))
-        range = min(position + 1, length_template);
-
+    if (range > min(position + 1, min(length_num, length_template)))
+        range = min(position + 1, min(length_num, length_template));
+    
     for (i = 0; i < range; i++)
         mask = mask * 2 + 1;
     template = (template & mask) << (position + 1 - range);
