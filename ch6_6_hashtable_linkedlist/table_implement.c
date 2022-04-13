@@ -54,6 +54,7 @@ void free_node(struct node *node)
 {
     if (node && (node->next))
         free_node(node->next);
+    printf("---To free node \"%s\"---\n", node->key);
     free(node);
 }
 
