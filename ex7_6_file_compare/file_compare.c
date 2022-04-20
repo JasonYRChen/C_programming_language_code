@@ -61,64 +61,46 @@ int file_compare(char *f1_in_name, char *f1_out_name, char *f2_in_name, char *f2
 
     for (; !f_EOF[0] || !f_EOF[1]; line_no++) {
         // initialization for new line
-        for (i = 0; i < 2; i++) {
-            if ((c[i] = fgetc(f_in[i])) == EOF && !f_EOF[i])
-                f_EOF[i] = 1;
-            index[i] = 0;
-        }
+        index[0] = index[1] = 0;
+        c[0] = c[1] = 'a';
 
-        // comparison
+        // comparison line-by-line
         while ((!f_EOF[0] && c[0] != '\n') || (!f_EOF[1] && c[1] != '\n')) {
-            // raise different flag
-            if (c[0] != c[1])
+            // refresh c[i] and check EOF
+            // beware of necessity of "c[i] != '\n'" at the beginning of 'if' condition
+            for (i = 0; i < 2; i++) 
+                if ((c[i] != '\n') && (c[i] = fgetc(f_in[i])) == EOF && !f_EOF[i])
+                    f_EOF[i] = 1;
+
+            // raise difference flag
+            if ((c[0] != c[1]) && !flag_diff)
                 flag_diff = 1;
 
-            // write in buffers in condition of flag_diff
-            // This section is ugly, is there any way to rewrite them?
-            for (i = 0; i < 2; i++) {
-                if (!flag_diff) {
-                    // reallocate memory
-                    if (index[i] >= char_max - 2) {
-                        char_max = char_max * 3 / 2;
-                        buffers[0] = reallocate(buffers[0], index[0], char_max);
-                        buffers[1] = reallocate(buffers[1], index[1], char_max);
-                    }
-                    buffers[i][index[i]++] = c[i];
-                    c[i] = fgetc(f_in[i]);
-                } else {
-                    // since difference occur, there's no need to compare the rests,
-                    // therefore write them into buffers, respectively
-                    while (c[i] != '\n' && c[i] != EOF) {
-                        // reallocate memory
-                        if (index[i] >= char_max - 2) {
-                            char_max = char_max * 3 / 2;
-                            buffers[0] = reallocate(buffers[0], index[0], char_max);
-                            buffers[1] = reallocate(buffers[1], index[1], char_max);
-                        }
-                        buffers[i][index[i]++] = c[i];
-                        c[i] = fgetc(f_in[i]);
-                    }
-                }
+            // reallocate to larger memory banks
+            if ((length = max(index[0], index[1])) >= char_max - 2) {
+                char_max = char_max * 3 / 2;
+                buffers[0] = reallocate(buffers[0], index[0], char_max);
+                buffers[1] = reallocate(buffers[1], index[1], char_max);
             }
+
+            // write in buffers only if not the end of line
+            for (i = 0; i < 2; i++) 
+                if (!f_EOF[i] && (c[i] != '\n'))
+                    buffers[i][index[i]++] = c[i];
         }
 
-        // Ending work: add '\n' and '\0' to the end of line
-        for (i = 0; i < 2; i++) {
-            buffers[i][index[i]++] = '\n';
-            buffers[i][index[i]] = '\0';
-        }
-        
-        // different flag raised, save buffers into respective files
+        // save the differences into files if any
         if (flag_diff) {
-            digit = digits(line_no);
-            fwrite = allocate((char_max + 1 + digit), "fwrite failed.");
+            fwrite = allocate(char_max + 1 + digits(line_no), "");
             for (i = 0; i < 2; i++) {
+                buffers[i][index[i]++] = '\n';
+                buffers[i][index[i]] = '\0';
                 sprintf(fwrite, "%i %s", line_no, buffers[i]);
                 fprintf(f_out[i], "%s", fwrite);
             }
             free(fwrite);
             flag_diff = 0;
-        } 
+        }
     }
 
     for (i = 0; i < 2; i++)
