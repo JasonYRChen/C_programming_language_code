@@ -76,12 +76,14 @@ void command(int *bitmap, int len_bitmap, int bits)
 {
     int row, col;
     int flag_stop = 0;
-    char cmd[2];
+    char cmd[100];
+    char action;
 
     while (!flag_stop) {
         printf("Enter command (format: s/r/q row col): ");
-        scanf("%s %i %i", cmd, &row, &col);
-        switch (cmd[0]) {
+        fgets(cmd, sizeof(cmd), stdin);
+        sscanf(cmd, "%c %i %i", &action, &row, &col);
+        switch (action) {
             default:
                 printf("Unknown command. Ready to quit\n");
             case 'q':
