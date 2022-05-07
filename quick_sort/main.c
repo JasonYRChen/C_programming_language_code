@@ -17,20 +17,20 @@ int test_compare(const void *x, const void *y)
 
 int main()
 {
-    //char *array[] = {"abcd", "Abcd", "aBcd", "ABcd"};
-    //int unit = sizeof(char *);
-    //enum type t = CHAR;
-    //int *cmp = string_compare;
+    char *array[] = {"abcd", "Abcd", "aBcd", "ABcd"};
+    int unit = sizeof(char *);
+    enum type t = CHAR;
+    int (*cmp)(const void*, const void*) = string_compare;
 
     //int array[] = {8, -1, 5, 0, 3, 7, 3, 6};
     //int unit = sizeof(int);
     //enum type t = INT;
-    //int *cmp = integer_compare;
+    //int (*cmp)(const void*, const void*) = integer_compare;
 
-    struct test array[] = {{"Jim", 20}, {"Tina", 17}, {"Bob", 10}};
-    int unit = sizeof(struct test);
-    enum type t = TEST;
-    int *cmp = test_compare;
+    //struct test array[] = {{"Jim", 20}, {"Tina", 17}, {"Bob", 10}};
+    //int unit = sizeof(struct test);
+    //enum type t = TEST;
+    //int (*cmp)(const void*, const void*) = test_compare;
 
     int length = sizeof(array) / unit;
 
